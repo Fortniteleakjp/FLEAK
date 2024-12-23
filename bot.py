@@ -43,11 +43,6 @@ print_fleak()
 
 def print_kuuhaku():
     kuuhaku = """
-
-
-
-
-
     """
     print(kuuhaku)
 
@@ -62,7 +57,8 @@ while True:
     print("5. 複合化ファイルアイテム取得")
     print("6. ニュースフィード")
     print("7. プレイリスト取得")
-    print("8. 終了")
+    print("8. 好きなアイテムの画像生成")
+    print("9. 終了")
     choice = input("番号を選択してください: ")
 
     # 最新のマップをダウンロード
@@ -272,14 +268,14 @@ while True:
                 print(f"パックID {pak_id} のデータを取得中...")
                 cosmetics_url = cosmetics_base_url.format(pak_id)
                 cosmetics_response = requests.get(cosmetics_url)
+
+                if cosmetics_response.status_code == 404:
+                    print(f"パックID {pak_id} のデータは見つかりませんでした。404エラーが発生しました。")
+                    continue
                 cosmetics_response.raise_for_status()
                 cosmetics_data = cosmetics_response.json()
 
                 items = cosmetics_data.get("data", [])
-                if not items:
-                    print(f"パックID {pak_id} のデータが見つかりませんでした。")
-                    continue
-
                 for item in items:
                     name = item.get("name", "不明")
                     icon = item.get("images", {}).get("icon", None)
@@ -407,8 +403,82 @@ while True:
             print(f"エラーが発生しました: {e}")
         except Exception as e:
             print(f"予期しないエラーが発生しました: {e}")
-
+    
     elif choice == "8":
+        print("アイテム名を入力してください:")
+        item_name = input("アイテム名: ").strip()
+
+        if not item_name:
+            print("アイテム名が入力されていません。")
+            continue
+        item_url = f"https://fortnite-api.com/v2/cosmetics/br/search?name={item_name}&language=ja&searchLanguage=ja"
+
+        try:
+            print(f"アイテム情報を取得中: {item_name}...")
+            response = requests.get(item_url)
+            response.raise_for_status()
+            data = response.json()
+            
+            # 'data' キーが存在し、かつ中身がある場合
+            if "data" not in data or not data["data"]:
+                print(f"アイテム '{item_name}' の情報が見つかりませんでした。")
+                continue
+
+            # data["data"] がリストでなく辞書なので、直接取り出す
+            item_data = data["data"]
+            name = item_data.get("name", "不明")
+            description = item_data.get("description", "不明")
+            icon_url = item_data.get("images", {}).get("smallIcon", None)
+            variants = item_data.get("variants", [])
+            print(f"アイテム名: {name}")
+            print(f"説明: {description}")
+            
+            # アイテム名のフォルダを作成
+            folder_path = os.path.join(os.getcwd(), item_name)  # 現在のディレクトリにフォルダ作成
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+                print(f"フォルダ '{item_name}' を作成しました。")
+
+            # 背景画像（itemback.PNG）の読み込み
+            background_image = Image.open("itemback.PNG").convert("RGBA")
+            width, height = background_image.size
+
+            # アイコン画像のダウンロードと保存
+            if icon_url:
+                print(f"{item_name}の画像をダウンロード中... ")
+                image_response = requests.get(icon_url, stream=True)
+                image_response.raise_for_status()
+                item_image = Image.open(image_response.raw).convert("RGBA")
+                item_image = item_image.resize((item_image.width * 4, item_image.height * 4))  # アイテム画像を4倍に拡大
+                background_image.paste(item_image, (50, 50), item_image)  # アイテム画像を背景に重ねる
+            name_image = Image.open("nameimage.PNG").convert("RGBA")
+            background_image.paste(name_image, (width - name_image.width, 50), name_image)
+
+            font = ImageFont.truetype("GENEIPOPLEPW-BK.TTF", 40)  # アイテム名と説明に使うフォント
+
+            # テキストの描画(地獄)の開始
+            draw = ImageDraw.Draw(background_image)
+
+            # アイテム名
+            draw.text((520, height - 190), name, font=font, fill=(300, 255, 255))
+            # アイテムの説明
+            draw.text((65, height - 100), description, font=font, fill=(255, 255, 255))
+
+            final_image_path = os.path.join(folder_path, f"{name}_final_image.png")
+            background_image.save(final_image_path)
+            print(f"'{final_image_path}' に保存しました。")
+        except requests.exceptions.RequestException as e:
+            print(f"リクエスト中にエラーが発生しました: {e}")
+            print(f"ステータスコード: {e.response.status_code if e.response else '不明'}")
+            if e.response is not None:
+                print(f"レスポンス内容: {e.response.text}")
+        except Exception as e:
+            import traceback
+            print(f"予期しないエラーが発生しました: {e}")
+            print("エラートレースバック:")
+            traceback.print_exc()
+
+    elif choice == "9":
         print("プログラムを終了します。")
         break
 
