@@ -23,9 +23,9 @@ font_path = "GENEIPOPLEPW-BK.TTF"
 map_url = "https://fortnite-api.com/images/map_ja.png"
 newcosmetics_url = "https://fortnite-api.com/v2/cosmetics/new?language=ja"
 allcosmetics_url = "https://fortnite-api.com/v2/cosmetics?language=ja"
-lobby_url = "https://fljpapi.onrender.com/api/lobby"
-newsapi_url = "https://fljpapi.onrender.com/api/news?platform=Windows&language=ja&country=JN&battlepass=true&battlepassLevel=100&tags=Product.BR"
-mnemonicurl = "https://fljpapi.onrender.com/api/links/fn/mnemonic/set_br_playlists"
+lobby_url = "https://fljpapi2-8h78.onrender.com/api/lobby"
+newsapi_url = "hhttps://fljpapi-c73j.onrender.com/api/v2/news?platform=Windows&language=ja&country=JN&battlepass=true&battlepassLevel=100&tags=Product.BR"
+mnemonicurl = "https://fljpapi-c73j.onrender.com/api/v2/links/fn/set_br_playlists"
 
 # アスキーアートで「FLeak」を表示
 def print_fleak():
