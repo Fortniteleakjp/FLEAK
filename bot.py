@@ -23,9 +23,9 @@ font_path = "GENEIPOPLEPW-BK.TTF"
 map_url = "https://fortnite-api.com/images/map_ja.png"
 newcosmetics_url = "https://fortnite-api.com/v2/cosmetics/new?language=ja"
 allcosmetics_url = "https://fortnite-api.com/v2/cosmetics?language=ja"
-lobby_url = "https://fljpapi2-cx6g.onrender.com/api/lobby"
+lobby_url = "https://fljpapi2-cx6g.onrender.com/api/v2/lobby"
 newsapi_url = "https://fljpapi-zqlw.onrender.com/api/v2/news?platform=Windows&language=ja&country=JN&tags=Product.BR"
-mnemonicurl = "https://fljpapi-zqlw.onrender.com/api/links/fn/mnemonic/set_br_playlists"
+mnemonicurl = "https://fljpapi-zqlw.onrender.com/api/v2/links/fn/set_br_playlists"
 
 # アスキーアートで「FLeak」を表示
 def print_fleak():
@@ -180,7 +180,7 @@ while True:
             response.raise_for_status()
             data = response.json()
             # 背景画像のURL取得
-            backgrounds = data.get("data", {}).get("backgrounds", {}).get("backgrounds", [])
+            backgrounds = data.get("data", {}).get("BR_background", [])
             if not backgrounds:
                 print("背景データが見つかりませんでした。")
             else:
