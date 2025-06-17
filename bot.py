@@ -23,9 +23,9 @@ font_path = "GENEIPOPLEPW-BK.TTF"
 map_url = "https://fortnite-api.com/images/map_ja.png"
 newcosmetics_url = "https://fortnite-api.com/v2/cosmetics/new?language=ja"
 allcosmetics_url = "https://fortnite-api.com/v2/cosmetics?language=ja"
-lobby_url = "https://fljpapi.onrender.com/api/lobby"
-newsapi_url = "https://fljpapi.onrender.com/api/news?platform=Windows&language=ja&country=JN&battlepass=true&battlepassLevel=100&tags=Product.BR"
-mnemonicurl = "https://fljpapi.onrender.com/api/links/fn/mnemonic/set_br_playlists"
+lobby_url = "https://fljpapi2-cx6g.onrender.com/api/lobby"
+newsapi_url = "https://fljpapi-zqlw.onrender.com/api/v2/news?platform=Windows&language=ja&country=JN&tags=Product.BR"
+mnemonicurl = "https://fljpapi-zqlw.onrender.com/api/links/fn/mnemonic/set_br_playlists"
 
 # アスキーアートで「FLeak」を表示
 def print_fleak():
@@ -60,20 +60,17 @@ while True:
     print("8. 好きなアイテムの画像生成")
     print("9. 終了")
     choice = input("番号を選択してください: ")
-
     # 最新のマップをダウンロード
     if choice == "1":
         print("処理を開始します...")
         if not os.path.exists(map_folder_name):
             print(f"{map_folder_name} フォルダが存在しないため作成します...")
             os.makedirs(map_folder_name)
-
         try:
             print("マップ画像をダウンロード中...")
             response = requests.get(map_url, stream=True)
             response.raise_for_status()
             total_size = int(response.headers.get("content-length", 0))
-
             save_path = os.path.join(map_folder_name, map_file_name)
             with open(save_path, "wb") as file, tqdm(
                 total=total_size,
@@ -86,18 +83,15 @@ while True:
                     if chunk:
                         file.write(chunk)
                         pbar.update(len(chunk))
-
             print(f"ダウンロード完了！ {save_path} に保存されました。")
         except requests.exceptions.RequestException as e:
             print(f"エラーが発生しました: {e}")
-
     # NEWコスメティックの取得
     elif choice == "2":
         print("処理を開始します...")
         if not os.path.exists(cosmetics_folder_name):
             print(f"{cosmetics_folder_name} フォルダが存在しないため作成します...")
             os.makedirs(cosmetics_folder_name)
-
         try:
             print("APIからデータを取得中...")
             response = requests.get(newcosmetics_url)
@@ -129,19 +123,15 @@ while True:
                         file.write(f"スキン画像: {icon_url}\n\n")
                         file.write("-" * 125 + "\n\n")
                         pbar.update(1)
-
                 print(f"データの保存が完了しました！ ファイル: {save_path}")
-
         except requests.exceptions.RequestException as e:
             print(f"エラーが発生しました: {e}")
-
     # 全コスメティックを取得
     elif choice == "3":
         print("処理を開始します...")
         if not os.path.exists(allcosmetics_folder_name):
             print(f"{allcosmetics_folder_name} フォルダが存在しないため作成します...")
             os.makedirs(allcosmetics_folder_name)
-
         try:
             print("APIからデータを取得中...")
             response = requests.get(allcosmetics_url)
@@ -173,28 +163,22 @@ while True:
                         file.write(f"スキン画像: {icon_url}\n\n")
                         file.write("-" * 125 + "\n\n")
                         pbar.update(1)
-
                 print(f"データの保存が完了しました！ ファイル: {save_path}")
-
         except requests.exceptions.RequestException as e:
             print(f"エラーが発生しました: {e}")
-
     # ロビー背景の取得
     elif choice == "4":
         print("処理を開始します...")
-
         # フォルダが存在しなければ作成
         if not os.path.exists(lobby_folder_name):
             print(f"{lobby_folder_name} フォルダが存在しないため作成します...")
             os.makedirs(lobby_folder_name)
-
         # ロビー背景の取得
         try:
             print("APIからロビー背景を取得中...")
             response = requests.get(lobby_url)
             response.raise_for_status()
             data = response.json()
-
             # 背景画像のURL取得
             backgrounds = data.get("data", {}).get("backgrounds", {}).get("backgrounds", [])
             if not backgrounds:
@@ -209,7 +193,6 @@ while True:
                     response = requests.get(background_image_url, stream=True)
                     response.raise_for_status()
                     total_size = int(response.headers.get("content-length", 0))
-
                     # ファイル保存
                     save_path = os.path.join(lobby_folder_name, lobby_file_name)
                     with open(save_path, "wb") as file, tqdm(
@@ -223,102 +206,80 @@ while True:
                             if chunk:
                                 file.write(chunk)
                                 pbar.update(len(chunk))
-
                     print(f"ダウンロード完了！ {save_path} に保存されました。")
-
         except requests.exceptions.RequestException as e:
             print(f"エラーが発生しました: {e}")
         except Exception as e:
             print(f"予期しないエラーが発生しました: {e}")
-
     elif choice == "5":
         print("複合化アイテムの処理を開始します...")
-
         # フォルダが存在しない場合は作成
         if not os.path.exists(decrypted_folder_name):
             print(f"{decrypted_folder_name} フォルダが存在しないため作成します...")
             os.makedirs(decrypted_folder_name)
-
         if not os.path.exists(font_path):
             print(f"フォントファイル {font_path} が見つかりません。正しいパスを指定してください。")
             continue
-
         try:
             # AESキーを取得
             print("AESキーを取得中...")
             aes_response = requests.get(aes_url)
             aes_response.raise_for_status()
             aes_data = aes_response.json()
-
             dynamic_keys = aes_data.get("dynamicKeys", [])
             if not dynamic_keys:
                 print("AESキーが見つかりませんでした。")
                 continue
-
             for key in tqdm(dynamic_keys, desc="進行状況", colour="green"):
                 pak_name = key.get("name", "")
                 match = re.search(r'(\d+)', pak_name)
                 pak_id = match.group(1) if match else None
-
                 if not pak_id:
                     print(f"無効なpak ID: {pak_name}")
                     continue
-
                 # コスメティックデータを取得
                 print(f"パックID {pak_id} のデータを取得中...")
                 cosmetics_url = cosmetics_base_url.format(pak_id)
                 cosmetics_response = requests.get(cosmetics_url)
-
                 if cosmetics_response.status_code == 404:
                     print(f"パックID {pak_id} のデータは見つかりませんでした。404エラーが発生しました。")
                     continue
                 cosmetics_response.raise_for_status()
                 cosmetics_data = cosmetics_response.json()
-
                 items = cosmetics_data.get("data", [])
                 for item in items:
                     name = item.get("name", "不明")
                     icon = item.get("images", {}).get("icon", None)
-
                     if not icon:
                         print(f"アイテム {name} の画像が見つかりませんでした。")
                         continue
-
                     # 名前の処理と画像作成
                     clean_name = re.sub(r'[^a-zA-Z0-9]', '', name)
                     font_size = 60 if len(clean_name) >= 16 else 55
                     font = ImageFont.truetype(font_path, size=font_size)
-
                     print(f"アイテム {name} の画像をダウンロード中...")
                     image_response = requests.get(icon, stream=True)
                     image_response.raise_for_status()
-
                     item_image = Image.open(image_response.raw).convert("RGBA")
                     new_width, new_height = int(item_image.width * 4.3), int(item_image.height * 4.3)
                     item_image = item_image.resize((new_width, new_height))
-
                     # ベース画像と合成
                     base_image = Image.open("itemback.PNG").convert("RGBA")
                     base_image.paste(item_image, (0, 0), item_image)
-
                     name_image = Image.open("nameimage.PNG").convert("RGBA")
                     base_image.paste(name_image, (0, 0), name_image)
-
                     draw = ImageDraw.Draw(base_image)
                     text_width, text_height = draw.textbbox((0, 0), name, font=font)[2:4]
                     text_position = ((base_image.width - text_width) // 2, base_image.height - text_height - 120)
                     draw.text(text_position, name, font=font, fill=(255, 255, 255, 255))
-
                     save_path = os.path.join(decrypted_folder_name, f"{clean_name}.png")
                     base_image.save(save_path, format="PNG")
                     print(f"保存完了: {save_path}")
-
             print("複合化アイテムの処理が完了しました！")
         except requests.exceptions.RequestException as e:
             print(f"エラーが発生しました: {e}")
         except Exception as e:
             print(f"予期しないエラーが発生しました: {e}")
-
     elif choice == "6":
         print("ニュースフィードを取得中...")
 
